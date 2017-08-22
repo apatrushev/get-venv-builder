@@ -35,8 +35,8 @@ def resource_lines(name):
 
 
 @click.command()
-@click.option('--output', default='get-venv.py', help='output filename')
-@click.option('--post-code', type=click.File('rb'), help='path to post create code')
+@click.option('--output', default='get-venv.py', help='Output filename.')
+@click.option('--post-code', type=click.File('rb'), help='Path to post create code.')
 def main(output, post_code):
     with open(output, 'wb') as target:
         target.write(WARNING)

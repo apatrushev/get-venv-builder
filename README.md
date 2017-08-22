@@ -2,39 +2,45 @@
 Python2 is still alive in the wild and needs to be bootstrapped time to time.
 This bootstrapping procedures can be complex if you do not want (or can not)
 pollute system wide python env. You need to create virtual environment, but
-venv package is part of stdlib only since Python 3.3.
+venv package became part of stdlib only since Python 3.3.
 
-This package creates such bootstrapping scripts. You can create your own scripts
-which will do some additional actions after creating virtual environment.
+This package helps to create bootstrap scripts. Also you can create your
+own scripts which will do some additional actions after creating virtual
+environment.
 
 You can find examples of such custom additional actions in
 the [examples directory](examples).
 
-## Build
+Target bootstrap script will create clean virtual environment in `venv` subfolder
+of current directory on run.
+
+## Prepare
+### Build
 ```shell
 pip wheel --no-deps -w . .
 ```
 
-## Install
-One of the following:
-```shell
-pip install .
-pip install -e .
+### Install
+From PyPI:
+```
 [COMING SOON] pip install get-venv-builder
-[COMING SOON] curl -L [some-fixme-url] | python
+```
+... to clean separate venv (dogfooding):
+```shell
+curl -L https://raw.githubusercontent.com/apatrushev/get-venv-builder/master/bootstrap.py | python
 ```
 
 ## Use
-### Create bootstrapping script
-Just execute package as module:
-```shell
-python -m get-venv-builder
-```
-... or console script:
+### Create bootstrap script
+Just execute console script:
 ```shell
 gvb
 ```
-Default name for result script is ```get-venv.py```.
+... or package as module:
+```shell
+python -m get-venv-builder
+```
+Default name for result script is `get-venv.py`.
 
 ### CLI docs
 ```shell
@@ -42,13 +48,13 @@ Default name for result script is ```get-venv.py```.
 Usage: gvb [OPTIONS]
 
 Options:
-  --output TEXT         output filename
-  --post-code FILENAME  path to post create code
+  --output TEXT         Output filename.
+  --post-code FILENAME  Path to post create code.
   --help                Show this message and exit.
 ```
 
 ### Custom post-actions
-Just create your action as python script and provide it to bootstrap creator:
+Create your action as python script and provide it to bootstrap creator:
 ```python
 import os
 VENV_PYTHON = globals().get('VENV_PYTHON', 'python')
