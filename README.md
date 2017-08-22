@@ -38,7 +38,7 @@ gvb
 ```
 ... or package as module:
 ```shell
-python -m get-venv-builder
+python -m get_venv_builder
 ```
 Default name for result script is `get-venv.py`.
 
