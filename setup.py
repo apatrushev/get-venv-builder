@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='get-venv-builder',
@@ -17,5 +17,8 @@ setup(
     },
     install_requires=[
         'click',
-    ]
+    ],
+    entry_points={
+        'console_scripts': ['gvb=get_venv_builder.build:main'],
+    }
 )
