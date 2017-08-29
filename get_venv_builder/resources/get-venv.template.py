@@ -1,5 +1,6 @@
 import base64
 import contextlib
+import logging
 import os
 import shutil
 import sys
@@ -40,7 +41,12 @@ def main(executable, *args):
                 venv_boot_filename,
                 VENV_FOLDER
             ))
-        post_create()
+
+        try:
+            post_create()
+        except:
+            logging.error('post create code failed')
+            shutil.rmtree(VENV_FOLDER, ignore_errors=True)
 
 
 def post_create():
