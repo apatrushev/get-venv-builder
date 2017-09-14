@@ -4,11 +4,13 @@ only in case if you know what you are doing
 """
 import base64
 import contextlib
+import logging
 import os
 import shutil
 import sys
 import tempfile
 import zlib
+import subprocess
 
 
 VENV_FOLDER = 'venv'
@@ -17,22 +19,22 @@ VENV_PYTHON = os.path.join(
     'Scripts' if sys.platform == 'win32' else 'bin',
     'python'
 )
-VENV_BOOT_DATA = """eNrFVduO2zYQfddXsMiDJMPherfoS4AtmgZOYaBwjGwuKIJAoKWRzYQiVXLk
-WA3y7x1S17je9rEGFsvh3A7PXFRaU7EsKxtsLGQZk1VtLLLaSo10q3OURkelt8qNRjijkvvBKlfGSX1Y
-DqpKaHEAG/Vq44aTheHk2vEShS2lGjUIVT2X3bFBqUbJqQht+yxi9AtwGqsIyt2AhURTg570D0hvOGxe
-DQaDHME5hxrZJlyvrTX2H1G5hT8bcPhocGkG1a8tgqMswk0Zot0fu032br19l+2e/7Zm9yw+Itbu2c1N
-3daS1y0ejebGHoJ8c5IWG6FAn+Jos9282Tz/PSNn71e3T+l6FUdRlOOZbogInlsQCFkBpWgUZj37SepN
-eH6E/HN2NA61qIA8XgrlIKhOYGXZZpUpoI/0Yv36TbZ9tV1T/F8uqkjhqXCVOYm9gsyXp5A2STuyqHgH
-QIoylI1Xnwt/JhRe30pQRW8VLrpycluhBUg6RUpZnzAntMSWBdyRLKlteC3wyOEsHbpkRkjKjGUDAiuk
-A/a60SgrCGVMYqKKEUjI0diWCUU8FS3rAsVpBIrCE80JdSEnBKeU/cxumdDFZdLB4MPtx39J54AoK5hD
-4ov9R256aAmYH9nJG1JDRV8kHocRSvoOS77vnHGy7ql8aeqbzIKrO0SyDAInInOqaJKyH+7Z3WrVaR/D
-/N4afQiORpOS8II8QdfVu3a3ibv6FQQ7I1BU4a3R0HU+sa+kBib1DIb/VWRmqQUEPTDZx3yRhH7ni6mz
-+YJqzg9/pXxRFT/xRbwMsdIxBj2H5soxbTCknKJf4Kn4wZqmdkn6YfXRN8yoI+/J89rjJzjBKeQqTaOL
-uGvFl12FJquRluvVGjLzAroS/I8FEyhCFSiBb72ke9FbTbRHvXJYUImX0+5JVybco/ZCRlKH7bvH93ub
-Bwb8yew/3YeIwdOfphd5iYYKrchRKJUMcTvQfhayuiVow/x9MlIno/dgvRxvyE4R6R7nGIraYDKY1Zj2
-bBzuiQr/7wl7ERYnw6PvYYlSKD+2UR+Yhp5iJvHX1Tf29Zb+7r7FnJqe2josBDhD3qDnajkgX7L5egpT
-/jBbCtG1fdORs5c6K40qwPo1T1Ls+8Mb1kqgz+q7I/4i9Y93MQNa4Sx+yK2saZvMufNfkkv+ZpiWs0RL
-/znx9n3LXDz5acVqWRMxzldqNgUjCbOU6WMhZsNDHF5zXbL5dk2vfB3mnP4NeU7YRQ==
+VENV_BOOT_DATA = """eNrFVUuP2zYQvutXsMhBkuNwNxv0EmCLpoFTGCgcI5ukCBYLgZZGNhOKZMmR
+Y/XXd0hZj2ydFj3VF3M4w5lvvnmodqZhRVG32DooCiYbaxwy66RGutUlSqOTOliVRiOcUMndYFUq46Xe
+LwdVI7TYg0vOauOHk4Ph5LvxEoWrpRo1CI2dy/7QolSj5Kdju7POlOB9gq57mTD6RYCtUwTuZkBHorGg
+J/0dUlb79dvBYJATOJVgka3j9co54/7mlTv4owWP33UuzaD6pUPwFEX4KUKy/bRdFx9Xm4/F9tWvK3bL
+0gOi9S+vrmxnJbcdHozmxu2jfHWUDluhQB/TZL1Zv1+/+q2gx+Gd7Z7R9XWaJEmJJ7ohanjpQCAUFdSi
+VVic65HlwYSXByi/FAfjUYsG6MUboTxE1RGcrLuiMRWcPb1evXtfbN5uVuT/50d1JfdUysYcxU5BEQpW
+SZflPVlUzj0geRkKyZsvVTgTiqDvJKjqbBUv+gJz16ADyHpFTlGfMC+0xI5F3ImsqZG4FXjgcJIefTYj
+JGfGsQGBE9IDe9dqlA3EMmYpUcUIJJRoXMeEIp6qjvWO0jwBRe6J5oz6khOCY85+Ys+Z0NXjoIPB/fOH
+fwjngSirmEfii/1LbEq0BiwP7BgMqaGSrxIPw1Bl5w7Lvu2ccdZuqXx5HprMgbc9IllHgRORJVU0y9kP
+t+zm+rrXfg/z787ofXxoNCkJL8gj9F297bbrtK9fRbALAkUV3hgNfecT+0pqYFLPYIRfQ2aOWkBQgtku
+5Yss9jtfTJ3NF1Rzvv8z54um+pEv0mX0lY8+KB2aK8+0wRhy8v4IT8P3zrTWZ/n99UNomFFHr6eXl5Kf
+4MRHMVZtWl2lfSu+6Ss0WY20XK7WEJlX0JfgfyyYQBGrQAFC62V9Rh800Z6clcOCyoKc9yldmPCAOggF
+ST22b5I/b3IeGQgns/t8Gz3Gl+E0ZRQkGip0okShVDb47UGHWShsR9CG+ftspM7G14P1crwhO0WkB5yj
+K2qDyWBWY9qzabwnKsLfE/Y6Lk6Gh9DDEqVQYWz7/TR+Z84btAxw4yKAE5QtBo6WA+Ilm6+lON13s2WQ
+XNozPSk7qYvaqApcWO8kpaEvgqFVAmnEmtAV6VepX9ykDGh1s/SudNLSFplzFr4gj3mbYVrOAi3DZyTY
+n1vlcqr3M8fLB/aUpc8aZqUlpnwo3WwsUu6tkvTB+c/+Lvggzf1s3S4f8gvfiznbfwG7XeXS
 """
 
 
@@ -55,19 +57,24 @@ def main(executable, *args):
             with open(venv_boot_filename, 'wb') as venv_boot_file:
                 venv_boot_file.write(data)
 
-            os.system('{0} {1} {2}'.format(
+            subprocess.check_call((
                 sys.executable,
                 venv_boot_filename,
                 VENV_FOLDER
             ))
-        post_create()
+
+        try:
+            post_create()
+        except:
+            logging.error('post create code failed')
+            shutil.rmtree(VENV_FOLDER, ignore_errors=True)
 
 
 def post_create():
-    import os
+    import subprocess
     VENV_PYTHON = globals().get('VENV_PYTHON', 'python')
     URL = 'git+https://github.com/apatrushev/get-venv-builder'
-    os.system('{0} -m pip install {1}'.format(VENV_PYTHON, URL))
+    subprocess.check_call([VENV_PYTHON,] + '-m pip install'.split() + [URL,])
     pass
 
 

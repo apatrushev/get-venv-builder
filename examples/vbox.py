@@ -1,5 +1,6 @@
 import contextlib
 import os
+import subprocess
 import sys
 
 VENV_PYTHON = globals().get('VENV_PYTHON', 'python')
@@ -19,8 +20,8 @@ elif sys.platform == 'win32':
     vbox_path = os.environ['VBOX_MSI_INSTALL_PATH']
     sdk_install = 'install'
 with chdir(os.path.join(vbox_path, 'sdk', sdk_install)):
-    cmd = '{0} vboxapisetup.py build --build-base . --build-lib . install'
-    os.system(cmd.format(VENV_PYTHON))
+    cmd = 'vboxapisetup.py build --build-base . --build-lib . install'
+    subprocess.check_call([VENV_PYTHON,] + cmd.split())
 if sys.platform == 'win32':
-    cmd = '{0} -m pip install pypiwin32'
-    os.system(cmd.format(VENV_PYTHON))
+    cmd = '-m pip install pypiwin32'
+    subprocess.check_call([VENV_PYTHON,] + cmd.split())

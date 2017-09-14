@@ -6,6 +6,7 @@ import shutil
 import sys
 import tempfile
 import zlib
+import subprocess
 
 
 VENV_FOLDER = 'venv'
@@ -36,7 +37,7 @@ def main(executable, *args):
             with open(venv_boot_filename, 'wb') as venv_boot_file:
                 venv_boot_file.write(data)
 
-            os.system('{0} {1} {2}'.format(
+            subprocess.check_call((
                 sys.executable,
                 venv_boot_filename,
                 VENV_FOLDER

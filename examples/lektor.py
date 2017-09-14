@@ -1,3 +1,3 @@
-import os
+import subprocess
 VENV_PYTHON = globals().get('VENV_PYTHON', 'python')
-os.system('{0} -m pip install lektor'.format(VENV_PYTHON))
+subprocess.check_call([VENV_PYTHON,] + '-m pip install lektor'.split())

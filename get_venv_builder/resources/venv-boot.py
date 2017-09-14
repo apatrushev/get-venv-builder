@@ -7,6 +7,7 @@ import tarfile
 import tempfile
 import shutil
 import ssl
+import subprocess
 try:
     from urllib2 import urlopen
     from StringIO import StringIO
@@ -68,12 +69,12 @@ with removable_tempdir() as temp_dir:
     )
 
     # Create the initial env
-    os.system('{0} {1} {2}'.format(sys.executable, venv_py, INITIAL_ENV))
+    subprocess.check_call((sys.executable, venv_py, INITIAL_ENV))
 
 # Second stage
 if len(sys.argv) > 1:
     bin_folder = 'bin' if sys.platform != 'win32' else 'Scripts'
     venv_python = os.path.join(INITIAL_ENV, bin_folder, 'python')
-    os.system('{0} -m pip install virtualenv'.format(venv_python))
-    os.system('{0} -m virtualenv {1}'.format(venv_python, sys.argv[1]))
+    subprocess.check_call([venv_python,] + '-m pip install virtualenv'.split())
+    subprocess.check_call([venv_python,] + '-m virtualenv'.split() + [sys.argv[1],])
     shutil.rmtree(INITIAL_ENV)
