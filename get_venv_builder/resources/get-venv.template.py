@@ -46,7 +46,7 @@ def main(executable, *args):
         try:
             post_create()
         except:
-            logging.error('post create code failed')
+            logging.exception('post create code failed')
             shutil.rmtree(VENV_FOLDER, ignore_errors=True)
 
 
