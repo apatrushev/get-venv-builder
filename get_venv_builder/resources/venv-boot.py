@@ -15,7 +15,7 @@ except ImportError:
     from urllib.request import urlopen
     from io import BytesIO as StringIO
 
-PYPI_VENV_PAGE = 'https://pypi.python.org/pypi/virtualenv'
+PYPI_VENV_PAGE = 'https://pypi.org/project/virtualenv/'
 INITIAL_ENV = 'py-env0'
 
 
@@ -43,7 +43,7 @@ with closing(urlopen(PYPI_VENV_PAGE, context=ctx)) as resp:
         raise RuntimeError('Wrong response receive from PyPI')
     dist_url = None
     for line in resp:
-        m = re.match(b'.*(https.*virtualenv.*tar.gz).*md5.*', line)
+        m = re.match(b'.*<a href=".*(https.*virtualenv.*tar.gz)">.*', line)
         if m is not None:
             dist_url = m.groups()[0]
 if dist_url is None:
