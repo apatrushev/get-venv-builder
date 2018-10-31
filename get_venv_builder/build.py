@@ -17,9 +17,7 @@ cmd: {}
 '''
 
 
-def encode_lines(lines, first_line_indent=0, line_length=80):
-    data = LINESEP.join(lines)
-    data = zlib.compress(data, 9)
+def encode_bytes(data, first_line_indent=0, line_length=80):
     data = base64.b64encode(data)
 
     first_len = line_length - first_line_indent
@@ -29,6 +27,12 @@ def encode_lines(lines, first_line_indent=0, line_length=80):
     lines = (data[i:i+line_length] for i in range(0, len(data), line_length))
     for line in lines:
         yield line
+
+
+def encode_lines(lines, first_line_indent=0, line_length=80):
+    data = LINESEP.join(lines)
+    data = zlib.compress(data, 9)
+    yield from encode_bytes(data, first_line_indent, line_length)
 
 
 def resource_lines(name):
