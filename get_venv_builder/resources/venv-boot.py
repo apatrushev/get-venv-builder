@@ -1,5 +1,6 @@
 from __future__ import print_function
 from contextlib import closing, contextmanager
+import glob
 import os
 import re
 import sys
@@ -62,11 +63,20 @@ data = StringIO(data)
 with removable_tempdir() as temp_dir:
     with closing(tarfile.open(fileobj=data)) as data:
         data.extractall(temp_dir)
-    venv_py = os.path.join(
+
+    venv_py = glob.glob(os.path.join(
         temp_dir,
-        os.listdir(temp_dir)[0],
+        '*',
         'virtualenv.py'
-    )
+    ))
+    if not venv_py:
+        venv_py = glob.glob(os.path.join(
+            temp_dir,
+            '*',
+            '*',
+            'virtualenv.py'
+        ))
+    venv_py = venv_py[0]
 
     # Create the initial env
     subprocess.check_call((sys.executable, venv_py, INITIAL_ENV))
