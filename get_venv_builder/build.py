@@ -32,7 +32,8 @@ def encode_bytes(data, first_line_indent=0, line_length=80):
 def encode_lines(lines, first_line_indent=0, line_length=80):
     data = LINESEP.join(lines)
     data = zlib.compress(data, 9)
-    yield from encode_bytes(data, first_line_indent, line_length)
+    for line in encode_bytes(data, first_line_indent, line_length):
+        yield line
 
 
 def resource_lines(name):
