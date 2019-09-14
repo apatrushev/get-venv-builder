@@ -9,7 +9,7 @@ import zlib
 import subprocess
 
 
-VENV_FOLDER = 'venv'
+VENV_FOLDER = os.environ.get('VENV_FOLDER', 'venv')
 VENV_PYTHON = os.path.join(
     os.path.abspath(VENV_FOLDER),
     'Scripts' if sys.platform == 'win32' else 'bin',
