@@ -16,7 +16,7 @@ except ImportError:
     from urllib.request import urlopen
     from io import BytesIO as StringIO
 
-PYPI_VENV_PAGE = 'https://pypi.org/project/virtualenv/'
+PYPI_VENV_PAGE = 'https://pypi.org/project/virtualenv/16.7.9/'
 INITIAL_ENV = 'py-env0'
 
 
