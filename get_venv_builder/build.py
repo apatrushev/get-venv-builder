@@ -46,7 +46,8 @@ def resource_lines(name):
 @click.option('--post-code', type=click.File('rb'), help='Path to post create code.')
 def main(output, post_code):
     with open(output, 'wb') as target:
-        target.write(WARNING.format(' '.join(sys.argv)).encode())
+        cmdline = ' '.join(['gvb'] + sys.argv[1:])
+        target.write(WARNING.format(cmdline).encode())
         for line in resource_lines('get-venv.template.py'):
             if line.startswith(LINE_MARKER):
                 target.write(LINE_MARKER)
